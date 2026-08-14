@@ -5,6 +5,7 @@ const navLinks = document.querySelectorAll('.nav-link');
 
 navToggle.addEventListener('click', () => {
     navMenu.classList.toggle('open');
+    navToggle.classList.toggle('open');
     navToggle.setAttribute('aria-label', 
         navMenu.classList.contains('open') ? 'إغلاق القائمة' : 'فتح القائمة'
     );
@@ -14,6 +15,7 @@ navToggle.addEventListener('click', () => {
 navLinks.forEach(link => {
     link.addEventListener('click', () => {
         navMenu.classList.remove('open');
+        navToggle.classList.remove('open');
     });
 });
 
@@ -43,6 +45,9 @@ window.addEventListener('scroll', () => {
     } else {
         header.classList.remove('scrolled');
     }
+
+    // Animate elements on scroll - Intersection Observer alternative
+    animateOnScroll();
 });
 
 // ===== SMOOTH SCROLL FOR ANCHOR LINKS =====
@@ -69,16 +74,110 @@ const animateSkills = () => {
         const rect = bar.getBoundingClientRect();
         if (rect.top < window.innerHeight - 50) {
             const width = bar.style.width;
-            bar.style.width = '0%';
-            setTimeout(() => {
-                bar.style.width = width;
-            }, 100);
+            // Reset and animate
+            if (!bar.dataset.animated) {
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                    bar.dataset.animated = 'true';
+                }, 200);
+            }
         }
     });
 };
 
+// ===== INTERSECTION OBSERVER FOR ANIMATIONS =====
+const animateOnScroll = () => {
+    // Animate timeline items
+    document.querySelectorAll('.timeline-item').forEach((item, index) => {
+        const rect = item.getBoundingClientRect();
+        if (rect.top < window.innerHeight - 50) {
+            item.style.opacity = '1';
+            item.style.transform = 'translateX(0)';
+        }
+    });
+
+    // Animate qualification cards
+    document.querySelectorAll('.qual-card').forEach((card, index) => {
+        const rect = card.getBoundingClientRect();
+        if (rect.top < window.innerHeight - 50) {
+            card.style.opacity = '1';
+            card.style.transform = 'scale(1)';
+        }
+    });
+
+    // Animate skills groups
+    document.querySelectorAll('.skills-group').forEach((group, index) => {
+        const rect = group.getBoundingClientRect();
+        if (rect.top < window.innerHeight - 50) {
+            group.style.opacity = '1';
+            group.style.transform = 'translateY(0)';
+        }
+    });
+
+    // Animate project cards
+    document.querySelectorAll('.project-card').forEach((card, index) => {
+        const rect = card.getBoundingClientRect();
+        if (rect.top < window.innerHeight - 50) {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }
+    });
+
+    // Animate contact items
+    document.querySelectorAll('.contact-item').forEach((item, index) => {
+        const rect = item.getBoundingClientRect();
+        if (rect.top < window.innerHeight - 50) {
+            item.style.opacity = '1';
+            item.style.transform = 'translateX(0)';
+        }
+    });
+};
+
+// ===== INITIAL ANIMATION ON LOAD =====
+window.addEventListener('load', () => {
+    animateSkills();
+    animateOnScroll();
+    
+    // Animate home content
+    const homeContent = document.querySelector('.home-content');
+    if (homeContent) {
+        homeContent.style.opacity = '1';
+        homeContent.style.transform = 'translateY(0)';
+    }
+    
+    const homeImage = document.querySelector('.home-image');
+    if (homeImage) {
+        homeImage.style.opacity = '1';
+        homeImage.style.transform = 'scale(1)';
+    }
+});
+
+// ===== SKILLS ANIMATION ON SCROLL =====
 window.addEventListener('scroll', animateSkills);
 window.addEventListener('load', animateSkills);
+
+// ===== OBSERVER FOR REPEATED ANIMATIONS =====
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            // Re-animate skill bars in this section
+            const bars = entry.target.querySelectorAll('.skill-progress');
+            bars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 300);
+            });
+        }
+    });
+}, { threshold: 0.3 });
+
+// Observe skills sections
+document.querySelectorAll('.skills-group').forEach(group => {
+    observer.observe(group);
+});
 
 // ===== CONTACT FORM =====
 const contactForm = document.getElementById('contactForm');
